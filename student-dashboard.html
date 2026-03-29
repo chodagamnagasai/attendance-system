@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard – SmartAttend</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <nav class="navbar">
@@ -25,7 +27,6 @@
             <div class="welcome-body">
                 <div class="greeting" id="greetingText">Good Morning ☀️</div>
                 <div class="name">Welcome, <span id="studentName">Student</span> 👋</div>
-                <div class="sub">Ready to mark your attendance today?</div>
             </div>
         </div>
 
@@ -60,14 +61,15 @@
         function logout() { localStorage.clear(); }
 
         const name = localStorage.getItem("user") || "Student";
-        document.getElementById("studentName").textContent  = name;
+        document.getElementById("studentName").textContent = name;
         document.getElementById("avatarInitial").textContent = name.charAt(0).toUpperCase();
 
         const h = new Date().getHours();
         document.getElementById("greetingText").textContent =
             h < 12 ? "Good Morning ☀️" :
-            h < 17 ? "Good Afternoon 🌤️" : "Good Evening 🌙";
+                h < 17 ? "Good Afternoon 🌤️" : "Good Evening 🌙";
     </script>
 
 </body>
+
 </html>

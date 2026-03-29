@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,9 @@
             animation: fadeUp 0.35s ease both;
         }
 
-        .feature-panel.active { display: block; }
+        .feature-panel.active {
+            display: block;
+        }
 
         /* ── QR display inside panel ── */
         .qr-code-box {
@@ -43,8 +46,13 @@
         }
 
         @keyframes countdown {
-            from { width: 100%; }
-            to   { width: 0%; }
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
         }
 
         .qr-timer-bar {
@@ -76,14 +84,14 @@
             transition: transform 0.18s, box-shadow 0.18s;
             background: #4f46e5;
             color: white;
-            box-shadow: 0 2px 10px rgba(79,70,229,0.25);
+            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.25);
             width: auto;
             animation: none;
         }
 
         .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(79,70,229,0.35);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
         }
 
         /* ── Section tab switcher ── */
@@ -120,7 +128,7 @@
             background: #4f46e5;
             border-color: #4f46e5;
             color: #fff;
-            box-shadow: 0 2px 10px rgba(79,70,229,0.3);
+            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
         }
 
         /* ── Stat chips on attendance panels ── */
@@ -192,7 +200,6 @@
             <div class="welcome-body">
                 <div class="greeting" id="greetingText">Good Morning ☀️</div>
                 <div class="name">Welcome, <span id="facultyName">Faculty</span> 👋</div>
-                <div class="sub">Manage attendance for your class.</div>
             </div>
         </div>
 
@@ -211,13 +218,15 @@
                 <p>Generate live QR code</p>
             </div>
 
-            <div class="card blue" onclick="showFeature('present')" id="card-present" style="text-align:center; width:200px;">
+            <div class="card blue" onclick="showFeature('present')" id="card-present"
+                style="text-align:center; width:200px;">
                 <span class="card-icon">📋</span>
                 <h3>Today's Class</h3>
                 <p>Present class attendance</p>
             </div>
 
-            <div class="card purple" onclick="showFeature('overall')" id="card-overall" style="text-align:center; width:200px;">
+            <div class="card purple" onclick="showFeature('overall')" id="card-overall"
+                style="text-align:center; width:200px;">
                 <span class="card-icon">📊</span>
                 <h3>Overall History</h3>
                 <p>All previous sessions</p>
@@ -229,10 +238,12 @@
              FEATURE 1 — QR Code Generator
              ══════════════════════════════════════════ -->
         <div class="feature-panel panel" id="panel-qr">
-            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:4px;">
+            <div
+                style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:4px;">
                 <div>
                     <h2>📡 Live QR Code</h2>
-                    <p style="margin-top:2px;">Click <strong>Generate</strong> to start a new session. The code refreshes every 10 s.</p>
+                    <p style="margin-top:2px;">Click <strong>Generate</strong> to start a new session. The code
+                        refreshes every 10 s.</p>
                 </div>
                 <button class="action-btn" onclick="startQRSession()">▶ Generate QR</button>
             </div>
@@ -323,13 +334,13 @@
         function logout() { localStorage.clear(); }
 
         const name = localStorage.getItem("user") || "Faculty";
-        document.getElementById("facultyName").textContent   = name;
+        document.getElementById("facultyName").textContent = name;
         document.getElementById("avatarInitial").textContent = name.charAt(0).toUpperCase();
 
         const h = new Date().getHours();
         document.getElementById("greetingText").textContent =
             h < 12 ? "Good Morning ☀️" :
-            h < 17 ? "Good Afternoon 🌤️" : "Good Evening 🌙";
+                h < 17 ? "Good Afternoon 🌤️" : "Good Evening 🌙";
 
         /* ── Tab switching ── */
         let activePanel = null;
@@ -351,8 +362,8 @@
             document.getElementById("card-" + id).style.opacity = "0.85";
 
             // Load data for the opened panel
-            if (id === "present")  loadPresentAttendance();
-            if (id === "overall")  loadOverallHistory();
+            if (id === "present") loadPresentAttendance();
+            if (id === "overall") loadOverallHistory();
         }
 
         /* ══════════════════════════════════════
@@ -372,8 +383,8 @@
         function generateAndShow() {
             const code = "CLASS-" + Math.floor(Math.random() * 90000 + 10000);
             document.getElementById("qr-display").textContent = code;
-            localStorage.setItem("activeQR",  code);
-            localStorage.setItem("qrTime",    Date.now());
+            localStorage.setItem("activeQR", code);
+            localStorage.setItem("qrTime", Date.now());
             localStorage.setItem("activeSession", new Date().toLocaleDateString());
 
             // Show session time
@@ -382,7 +393,7 @@
 
             // Restart timer bar animation
             const wrap = document.getElementById("qr-timer-wrap");
-            const bar  = document.getElementById("qr-timer-bar");
+            const bar = document.getElementById("qr-timer-bar");
             wrap.style.display = "block";
             document.getElementById("qr-timer-label").textContent = "Next refresh in 10 seconds";
 
@@ -396,7 +407,7 @@
            FEATURE 2 — Present Class Attendance
            ══════════════════════════════════════ */
         function loadPresentAttendance() {
-            const today   = new Date().toLocaleDateString();
+            const today = new Date().toLocaleDateString();
             const records = JSON.parse(localStorage.getItem("attendance") || "[]");
             const todayRecords = records.filter(r => r.date === today);
 
@@ -404,7 +415,7 @@
             tbody.innerHTML = "";
 
             document.getElementById("stat-present").textContent = todayRecords.length;
-            document.getElementById("stat-date").textContent    = today;
+            document.getElementById("stat-date").textContent = today;
 
             if (todayRecords.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="no-records">No students marked present today.</td></tr>`;
@@ -426,7 +437,7 @@
            ══════════════════════════════════════ */
         function loadOverallHistory() {
             const records = JSON.parse(localStorage.getItem("attendance") || "[]");
-            const tbody   = document.getElementById("overall-table");
+            const tbody = document.getElementById("overall-table");
             tbody.innerHTML = "";
 
             // Group by date
@@ -439,7 +450,7 @@
             const dates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
 
             document.getElementById("ov-sessions").textContent = dates.length;
-            document.getElementById("ov-total").textContent    = records.length;
+            document.getElementById("ov-total").textContent = records.length;
 
             if (dates.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="3" class="no-records">No sessions recorded yet.</td></tr>`;
@@ -464,4 +475,5 @@
     </script>
 
 </body>
+
 </html>
