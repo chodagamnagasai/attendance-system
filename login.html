@@ -1,30 +1,43 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – SmartAttend</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="js/app.js" defer></script>
 </head>
-
 <body>
+    <div class="page-center">
+        <div class="form-card">
 
-    <div class="container">
+            <div class="form-title">Welcome back 👋</div>
+            <div class="form-subtitle">Sign in to Smart Attendance</div>
 
-        <h2>Login</h2>
+            <div class="field">
+                <label for="role">Role</label>
+                <div class="select-wrap">
+                    <select id="role">
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                    </select>
+                </div>
+            </div>
 
-        <select id="role">
-            <option value="student">Student</option>
-            <option value="faculty">Faculty</option>
-        </select><br>
+            <div class="field">
+                <label for="username">Full Name</label>
+                <input type="text" id="username" placeholder="Enter your name">
+            </div>
 
-        <input type="text" id="username" placeholder="Enter Name"><br>
+            <button onclick="login()">Sign In</button>
 
-        <button onclick="login()">Login</button>
-
+        </div>
     </div>
 
+    <script>
+        // Pre-select the role chosen on the landing page
+        const saved = localStorage.getItem("selectedRole");
+        if (saved) document.getElementById("role").value = saved;
+    </script>
 </body>
-
 </html>

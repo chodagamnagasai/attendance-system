@@ -1,34 +1,43 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <title>History</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance History – SmartAttend</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/app.js"></script>
+    <script src="js/app.js" defer></script>
 </head>
-
 <body onload="loadHistory()">
 
-    <div class="layout">
+    <nav class="navbar">
+        <a class="navbar-brand" href="student-dashboard.html">
+            <span class="dot"></span> SmartAttend
+        </a>
+        <div class="navbar-actions">
+            <a class="navbar-link" href="student-dashboard.html">← Back</a>
+        </div>
+    </nav>
 
-        <div class="sidebar">
-            <h2>Student</h2>
+    <div class="main">
+
+        <div class="section-header">
+            <h1>📋 Attendance History</h1>
+            <p>Your complete attendance log</p>
         </div>
 
-        <div class="main">
-
-            <h2>Attendance History</h2>
-
-            <table id="table">
-                <tr>
-                    <th>Date</th>
-                    <th>Status</th>
-                </tr>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
             </table>
-
         </div>
-    </div>
-</body>
 
+    </div>
+
+</body>
 </html>

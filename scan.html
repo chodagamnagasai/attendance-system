@@ -1,54 +1,70 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <title>Scan QR</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan QR – SmartAttend</title>
     <link rel="stylesheet" href="css/style.css">
-
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="js/app.js"></script>
-
+    <script src="js/app.js" defer></script>
+    <style>
+        /* Scanner fits neatly inside the panel */
+        #reader { border-radius: 10px; overflow: hidden; }
+        #reader img { border-radius: 10px; }
+        #scan-result {
+            margin-top: 14px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: none;
+        }
+    </style>
 </head>
-
 <body>
-    <div class="layout">
 
-        <div class="sidebar">
-            <h2>Student</h2>
-            <a href="student-dashboard.html">Dashboard</a>
+    <nav class="navbar">
+        <a class="navbar-brand" href="student-dashboard.html">
+            <span class="dot"></span> SmartAttend
+        </a>
+        <div class="navbar-actions">
+            <a class="navbar-link" href="student-dashboard.html">← Back</a>
+        </div>
+    </nav>
+
+    <div class="main">
+
+        <div class="section-header">
+            <h1>📷 Scan QR Code</h1>
+            <p>Point your camera at the QR displayed by your faculty</p>
         </div>
 
-        <div class="main">
-
-            <h2>Scan QR</h2>
-
-            <div id="reader" style="width:300px;"></div>
-
+        <div class="panel" style="max-width: 440px;">
+            <div id="reader"></div>
+            <div id="scan-result"></div>
         </div>
+
     </div>
+
     <script>
-
-        function onScanSuccess(decodedText) {
-            document.getElementById("result").innerText = decodedText;
-
-            // Put into input simulation
-            localStorage.setItem("scannedQR", decodedText);
-
-            // Call attendance function
-            scanRealQR(decodedText);
+        function onScanSuccess(text) {
+            const el = document.getElementById("scan-result");
+            el.style.display = "block";
+            el.textContent = "✅ Scanned: " + text;
+            scanRealQR(text);
         }
 
-        let scanner = new Html5QrcodeScanner("reader", {
-            fps: 10,
-            qrbox: 250
+        // Wait for html5-qrcode to be available before initialising
+        window.addEventListener("load", function () {
+            if (typeof Html5QrcodeScanner !== "undefined") {
+                const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+                scanner.render(onScanSuccess);
+            }
         });
-
-        scanner.render(onScanSuccess);
-
     </script>
 
 </body>
-
 </html>

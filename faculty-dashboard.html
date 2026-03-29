@@ -1,30 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Panel – SmartAttend</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js" defer></script>
+
+    <style>
+        /* ── Feature panels (hidden by default) ── */
+        .feature-panel {
+            display: none;
+            margin-top: 24px;
+            animation: fadeUp 0.35s ease both;
+        }
+
+        .feature-panel.active { display: block; }
+
+        /* ── QR display inside panel ── */
+        .qr-code-box {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: #0f172a;
+            background: #f4f6fb;
+            border: 2px dashed #c7d2fe;
+            border-radius: 12px;
+            padding: 28px 20px;
+            text-align: center;
+            margin: 18px 0;
+            word-break: break-all;
+        }
+
+        /* ── QR timer bar ── */
+        .qr-timer-wrap {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        @keyframes countdown {
+            from { width: 100%; }
+            to   { width: 0%; }
+        }
+
+        .qr-timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #db2777);
+            border-radius: 99px;
+            width: 100%;
+            animation: countdown 10s linear forwards;
+        }
+
+        .qr-timer-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 16px;
+        }
+
+        /* ── "Generate QR" action button ── */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 9px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            transition: transform 0.18s, box-shadow 0.18s;
+            background: #4f46e5;
+            color: white;
+            box-shadow: 0 2px 10px rgba(79,70,229,0.25);
+            width: auto;
+            animation: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79,70,229,0.35);
+        }
+
+        /* ── Section tab switcher ── */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1.5px solid #e2e8f0;
+            background: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.18s;
+            animation: none;
+            width: auto;
+            box-shadow: none;
+        }
+
+        .tab-btn:hover {
+            border-color: #4f46e5;
+            color: #4f46e5;
+            transform: none;
+        }
+
+        .tab-btn.active {
+            background: #4f46e5;
+            border-color: #4f46e5;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(79,70,229,0.3);
+        }
+
+        /* ── Stat chips on attendance panels ── */
+        .stat-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .stat-chip {
+            flex: 1;
+            min-width: 100px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-chip .stat-num {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .stat-chip .stat-label {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Session group headers in overall history ── */
+        .session-header {
+            background: #f1f5f9;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .session-header td {
+            padding: 8px 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+    </style>
 </head>
 
-<body onload="generateQR()">
+<body>
 
-    <div class="layout">
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <span class="dot"></span> SmartAttend
+        </a>
+        <div class="navbar-actions">
+            <a class="navbar-link danger" href="index.html" onclick="logout()">Logout</a>
+        </div>
+    </nav>
 
-        <div class="sidebar">
-            <h2>Faculty</h2>
-            <a href="#">Generate QR</a>
-            <a href="index.html">Logout</a>
+    <div class="main">
+
+        <!-- Welcome Banner -->
+        <div class="welcome">
+            <div class="welcome-avatar" id="avatarInitial">F</div>
+            <div class="welcome-body">
+                <div class="greeting" id="greetingText">Good Morning ☀️</div>
+                <div class="name">Welcome, <span id="facultyName">Faculty</span> 👋</div>
+                <div class="sub">Manage attendance for your class.</div>
+            </div>
         </div>
 
-        <div class="main">
+        <!-- Section header -->
+        <div class="section-header">
+            <h1>Faculty Panel</h1>
+            <p>Choose a feature to get started</p>
+        </div>
 
-            <div class="header">
-                <h1>Class Session</h1>
+        <!-- Feature Cards (clickable) -->
+        <div class="grid" style="margin-bottom: 32px;">
+
+            <div class="card green" onclick="showFeature('qr')" id="card-qr" style="text-align:center; width:200px;">
+                <span class="card-icon">📡</span>
+                <h3>QR Generator</h3>
+                <p>Generate live QR code</p>
             </div>
 
-            <div class="card">
-                <h3>Live QR Code</h3>
-                <div id="qr" class="qr-box">Loading...</div>
-                <p>Updates every 10 seconds</p>
+            <div class="card blue" onclick="showFeature('present')" id="card-present" style="text-align:center; width:200px;">
+                <span class="card-icon">📋</span>
+                <h3>Today's Class</h3>
+                <p>Present class attendance</p>
+            </div>
+
+            <div class="card purple" onclick="showFeature('overall')" id="card-overall" style="text-align:center; width:200px;">
+                <span class="card-icon">📊</span>
+                <h3>Overall History</h3>
+                <p>All previous sessions</p>
             </div>
 
         </div>
-    </div>
+
+        <!-- ══════════════════════════════════════════
+             FEATURE 1 — QR Code Generator
+             ══════════════════════════════════════════ -->
+        <div class="feature-panel panel" id="panel-qr">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:4px;">
+                <div>
+                    <h2>📡 Live QR Code</h2>
+                    <p style="margin-top:2px;">Click <strong>Generate</strong> to start a new session. The code refreshes every 10 s.</p>
+                </div>
+                <button class="action-btn" onclick="startQRSession()">▶ Generate QR</button>
+            </div>
+
+            <!-- Timer bar -->
+            <div id="qr-timer-wrap" class="qr-timer-wrap" style="display:none;">
+                <div class="qr-timer-bar" id="qr-timer-bar"></div>
+            </div>
+            <div class="qr-timer-label" id="qr-timer-label"></div>
+
+            <!-- QR display -->
+            <div class="qr-code-box" id="qr-display">— Press Generate —</div>
+
+            <p class="text-muted" id="qr-session-time"></p>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             FEATURE 2 — Present Class Attendance
+             ══════════════════════════════════════════ -->
+        <div class="feature-panel panel" id="panel-present">
+            <h2>📋 Today's Attendance</h2>
+            <p style="margin-top:2px; margin-bottom:20px;">Students who marked attendance in the current session.</p>
+
+            <!-- Stats -->
+            <div class="stat-row">
+                <div class="stat-chip">
+                    <div class="stat-num" id="stat-present">0</div>
+                    <div class="stat-label">Present</div>
+                </div>
+                <div class="stat-chip">
+                    <div class="stat-num" id="stat-date">—</div>
+                    <div class="stat-label">Date</div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="present-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             FEATURE 3 — Overall Attendance History
+             ══════════════════════════════════════════ -->
+        <div class="feature-panel panel" id="panel-overall">
+            <h2>📊 Overall Attendance History</h2>
+            <p style="margin-top:2px; margin-bottom:20px;">Attendance records across all sessions.</p>
+
+            <!-- Summary stats -->
+            <div class="stat-row">
+                <div class="stat-chip">
+                    <div class="stat-num" id="ov-sessions">0</div>
+                    <div class="stat-label">Sessions</div>
+                </div>
+                <div class="stat-chip">
+                    <div class="stat-num" id="ov-total">0</div>
+                    <div class="stat-label">Total Entries</div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Student Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="overall-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- .main -->
+
+    <script>
+        /* ── Init ── */
+        function logout() { localStorage.clear(); }
+
+        const name = localStorage.getItem("user") || "Faculty";
+        document.getElementById("facultyName").textContent   = name;
+        document.getElementById("avatarInitial").textContent = name.charAt(0).toUpperCase();
+
+        const h = new Date().getHours();
+        document.getElementById("greetingText").textContent =
+            h < 12 ? "Good Morning ☀️" :
+            h < 17 ? "Good Afternoon 🌤️" : "Good Evening 🌙";
+
+        /* ── Tab switching ── */
+        let activePanel = null;
+
+        function showFeature(id) {
+            // Hide all panels
+            document.querySelectorAll(".feature-panel").forEach(p => p.classList.remove("active"));
+            // Remove card highlight
+            document.querySelectorAll(".grid .card").forEach(c => c.style.opacity = "1");
+
+            if (activePanel === id) {
+                // Toggle off
+                activePanel = null;
+                return;
+            }
+
+            activePanel = id;
+            document.getElementById("panel-" + id).classList.add("active");
+            document.getElementById("card-" + id).style.opacity = "0.85";
+
+            // Load data for the opened panel
+            if (id === "present")  loadPresentAttendance();
+            if (id === "overall")  loadOverallHistory();
+        }
+
+        /* ══════════════════════════════════════
+           FEATURE 1 — QR Generator
+           ══════════════════════════════════════ */
+        let qrInterval = null;
+        let timerAnimation = null;
+
+        function startQRSession() {
+            // Clear any existing interval
+            if (qrInterval) clearInterval(qrInterval);
+
+            generateAndShow();
+            qrInterval = setInterval(generateAndShow, 10000);
+        }
+
+        function generateAndShow() {
+            const code = "CLASS-" + Math.floor(Math.random() * 90000 + 10000);
+            document.getElementById("qr-display").textContent = code;
+            localStorage.setItem("activeQR",  code);
+            localStorage.setItem("qrTime",    Date.now());
+            localStorage.setItem("activeSession", new Date().toLocaleDateString());
+
+            // Show session time
+            document.getElementById("qr-session-time").textContent =
+                "Generated at " + new Date().toLocaleTimeString() + " · refreshes every 10 s";
+
+            // Restart timer bar animation
+            const wrap = document.getElementById("qr-timer-wrap");
+            const bar  = document.getElementById("qr-timer-bar");
+            wrap.style.display = "block";
+            document.getElementById("qr-timer-label").textContent = "Next refresh in 10 seconds";
+
+            // Re-trigger animation
+            bar.style.animation = "none";
+            bar.offsetWidth;  // reflow
+            bar.style.animation = "countdown 10s linear forwards";
+        }
+
+        /* ══════════════════════════════════════
+           FEATURE 2 — Present Class Attendance
+           ══════════════════════════════════════ */
+        function loadPresentAttendance() {
+            const today   = new Date().toLocaleDateString();
+            const records = JSON.parse(localStorage.getItem("attendance") || "[]");
+            const todayRecords = records.filter(r => r.date === today);
+
+            const tbody = document.getElementById("present-table");
+            tbody.innerHTML = "";
+
+            document.getElementById("stat-present").textContent = todayRecords.length;
+            document.getElementById("stat-date").textContent    = today;
+
+            if (todayRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="no-records">No students marked present today.</td></tr>`;
+                return;
+            }
+
+            todayRecords.forEach((r, i) => {
+                tbody.innerHTML += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${r.name || localStorage.getItem("user") || "Student"}</td>
+                    <td><span class="badge badge-green">${r.status}</span></td>
+                    <td>${r.time || "—"}</td>
+                </tr>`;
+            });
+        }
+
+        /* ══════════════════════════════════════
+           FEATURE 3 — Overall History
+           ══════════════════════════════════════ */
+        function loadOverallHistory() {
+            const records = JSON.parse(localStorage.getItem("attendance") || "[]");
+            const tbody   = document.getElementById("overall-table");
+            tbody.innerHTML = "";
+
+            // Group by date
+            const grouped = {};
+            records.forEach(r => {
+                if (!grouped[r.date]) grouped[r.date] = [];
+                grouped[r.date].push(r);
+            });
+
+            const dates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+
+            document.getElementById("ov-sessions").textContent = dates.length;
+            document.getElementById("ov-total").textContent    = records.length;
+
+            if (dates.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="no-records">No sessions recorded yet.</td></tr>`;
+                return;
+            }
+
+            dates.forEach(date => {
+                // Session header row
+                tbody.innerHTML += `<tr class="session-header">
+                    <td colspan="3">📅 ${date} &nbsp;·&nbsp; ${grouped[date].length} student(s)</td>
+                </tr>`;
+
+                grouped[date].forEach((r, i) => {
+                    tbody.innerHTML += `<tr>
+                        <td>${date}</td>
+                        <td>${r.name || localStorage.getItem("user") || "Student"}</td>
+                        <td><span class="badge badge-green">${r.status}</span></td>
+                    </tr>`;
+                });
+            });
+        }
+    </script>
 
 </body>
+</html>

@@ -1,31 +1,39 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <title>Percentage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance % – SmartAttend</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/app.js"></script>
+    <script src="js/app.js" defer></script>
 </head>
-
 <body onload="loadPercentage()">
 
-    <div class="layout">
+    <nav class="navbar">
+        <a class="navbar-brand" href="student-dashboard.html">
+            <span class="dot"></span> SmartAttend
+        </a>
+        <div class="navbar-actions">
+            <a class="navbar-link" href="student-dashboard.html">← Back</a>
+        </div>
+    </nav>
 
-        <div class="sidebar">
-            <h2>Student</h2>
+    <div class="main">
+
+        <div class="section-header">
+            <h1>📊 Attendance %</h1>
+            <p>Based on 30 total classes</p>
         </div>
 
-        <div class="main">
-
-            <h2>Attendance Percentage</h2>
-
-            <div class="card">
-                <h1 id="percent"></h1>
+        <div class="panel" style="max-width: 400px;">
+            <div class="percent-value" id="percent">—</div>
+            <div class="percent-label">classes attended out of 30</div>
+            <div class="progress-wrap">
+                <div class="progress-bar" id="percentBar"></div>
             </div>
-
         </div>
-    </div>
-</body>
 
+    </div>
+
+</body>
 </html>

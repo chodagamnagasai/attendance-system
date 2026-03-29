@@ -1,32 +1,39 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <title>Smart Attendance System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>
+        function goLogin(role) {
+            localStorage.setItem("selectedRole", role);
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
-
 <body>
-    <canvas id="bg"></canvas>
-    <div class="container">
+    <div class="page-center">
 
-        <h1>Smart Attendance System</h1>
+        <div class="landing-logo">Smart<span>Attend</span></div>
+        <p class="landing-sub">Track attendance, effortlessly.</p>
 
-        <p>QR Code Based Attendance Management</p>
+        <div class="role-grid">
 
-        <div class="card">
-            <h3>Login as Student</h3>
-            <button onclick="location.href='login.html'">Student Login</button>
-        </div>
+            <div class="card blue" onclick="goLogin('student')" style="width:200px; text-align:center;">
+                <span class="card-icon">🎓</span>
+                <h3>Student</h3>
+                <p>Mark &amp; track attendance</p>
+            </div>
 
-        <div class="card">
-            <h3>Login as Faculty</h3>
-            <button onclick="location.href='login.html'">Faculty Login</button>
+            <div class="card indigo" onclick="goLogin('faculty')" style="width:200px; text-align:center;">
+                <span class="card-icon">👨‍🏫</span>
+                <h3>Faculty</h3>
+                <p>Generate live QR codes</p>
+            </div>
+
         </div>
 
     </div>
-
 </body>
-
 </html>

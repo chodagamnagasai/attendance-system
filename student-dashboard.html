@@ -1,51 +1,73 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <title>Student Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard – SmartAttend</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-    <div class="layout">
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <span class="dot"></span> SmartAttend
+        </a>
+        <div class="navbar-actions">
+            <a class="navbar-link danger" href="index.html" onclick="logout()">Logout</a>
+        </div>
+    </nav>
 
-        <div class="sidebar">
-            <h2>Student</h2>
-            <a href="scan.html">Scan QR</a>
-            <a href="history.html">History</a>
-            <a href="percentage.html">Attendance %</a>
-            <a href="index.html">Logout</a>
+    <div class="main">
+
+        <!-- Welcome Banner -->
+        <div class="welcome">
+            <div class="welcome-avatar" id="avatarInitial">S</div>
+            <div class="welcome-body">
+                <div class="greeting" id="greetingText">Good Morning ☀️</div>
+                <div class="name">Welcome, <span id="studentName">Student</span> 👋</div>
+                <div class="sub">Ready to mark your attendance today?</div>
+            </div>
         </div>
 
-        <div class="main">
-
-            <div class="header">
-                <h1>Dashboard</h1>
-            </div>
-
-            <div class="grid">
-
-                <div class="card">
-                    <h3>Scan QR</h3>
-                    <p>Mark attendance</p>
-                </div>
-
-                <div class="card">
-                    <h3>History</h3>
-                    <p>View records</p>
-                </div>
-
-                <div class="card">
-                    <h3>Attendance %</h3>
-                    <p>Check performance</p>
-                </div>
-
-            </div>
-
+        <!-- Section header -->
+        <div class="section-header">
+            <h1>Dashboard</h1>
+            <p>What would you like to do?</p>
         </div>
+
+        <!-- Cards -->
+        <div class="grid">
+            <div class="card blue" onclick="location.href='scan.html'">
+                <span class="card-icon">📷</span>
+                <h3>Scan QR</h3>
+                <p>Mark attendance</p>
+            </div>
+            <div class="card purple" onclick="location.href='history.html'">
+                <span class="card-icon">📋</span>
+                <h3>History</h3>
+                <p>View records</p>
+            </div>
+            <div class="card orange" onclick="location.href='percentage.html'">
+                <span class="card-icon">📊</span>
+                <h3>Attendance %</h3>
+                <p>Check performance</p>
+            </div>
+        </div>
+
     </div>
-</body>
 
+    <script>
+        function logout() { localStorage.clear(); }
+
+        const name = localStorage.getItem("user") || "Student";
+        document.getElementById("studentName").textContent  = name;
+        document.getElementById("avatarInitial").textContent = name.charAt(0).toUpperCase();
+
+        const h = new Date().getHours();
+        document.getElementById("greetingText").textContent =
+            h < 12 ? "Good Morning ☀️" :
+            h < 17 ? "Good Afternoon 🌤️" : "Good Evening 🌙";
+    </script>
+
+</body>
 </html>
