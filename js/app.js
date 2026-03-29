@@ -1,175 +1,109 @@
-// LOGIN
 function login() {
     let role = document.getElementById("role").value;
     let user = document.getElementById("username").value;
 
+    if (!user) {
+        alert("Enter name");
+        return;
+    }
+
     localStorage.setItem("user", user);
     localStorage.setItem("role", role);
 
-    if (role === "faculty") {
-        window.location.href = "faculty-dashboard.html";
-    } else {
-        window.location.href = "student-dashboard.html";
-    }
+    window.location.href =
+        role === "faculty"
+            ? "faculty-dashboard.html"
+            : "student-dashboard.html";
 }
 
-// =========================
-// FACULTY - QR GENERATION
-// =========================
+function logout() {
+    localStorage.clear();
+}
 
-let currentQR = "";
+let qrInterval;
 
 function generateQR() {
-    setInterval(() => {
-        currentQR = "CLASS-" + Math.floor(Math.random() * 10000);
-        document.getElementById("qr").innerText = currentQR;
 
-        // Save active QR + time
-        localStorage.setItem("activeQR", currentQR);
+    if (qrInterval) clearInterval(qrInterval);
+
+    function refresh() {
+        let code = "CLASS-" + Math.floor(Math.random() * 10000);
+        document.getElementById("qr").innerText = code;
+
+        localStorage.setItem("activeQR", code);
         localStorage.setItem("qrTime", Date.now());
-
-    }, 10000);
-}
-
-// =========================
-// STUDENT - SCAN QR
-// =========================
-
-function scanQR() {
-
-    let scanned = document.getElementById("qrInput").value;
-    let activeQR = localStorage.getItem("activeQR");
-    let time = localStorage.getItem("qrTime");
-
-    let now = Date.now();
-
-    // 10 sec validity
-    if (now - time > 10000) {
-        alert("QR Expired ❌");
-        return;
     }
 
-    if (scanned !== activeQR) {
-        alert("Invalid QR ❌");
-        return;
-    }
-
-    // Prevent duplicate
-    let records = JSON.parse(localStorage.getItem("attendance") || "[]");
-    let today = new Date().toLocaleDateString();
-
-    let already = records.find(r => r.date === today);
-
-    if (already) {
-        alert("Already Marked ❌");
-        return;
-    }
-
-    // Save attendance
-    records.push({ date: today, status: "Present" });
-    localStorage.setItem("attendance", JSON.stringify(records));
-
-    alert("Attendance Marked ✅");
+    refresh();
+    qrInterval = setInterval(refresh, 10000);
 }
 
-// =========================
-// HISTORY
-// =========================
-
-function loadHistory() {
-
-    let records = JSON.parse(localStorage.getItem("attendance") || "[]");
-
-    let table = document.getElementById("table");
-
-    records.forEach(r => {
-        table.innerHTML += `<tr>
-<td>${r.date}</td>
-<td>${r.status}</td>
-</tr>`;
-    });
-}
-
-// =========================
-// PERCENTAGE
-// =========================
-
-function loadPercentage() {
-
-    let records = JSON.parse(localStorage.getItem("attendance") || "[]");
-
-    let total = 30; // assumed classes
-    let present = records.length;
-
-    let percent = (present / total) * 100;
-
-    document.getElementById("percent").innerText =
-        percent.toFixed(2) + "%";
-}
-function scanRealQR(scanned) {
+function validateQR(scanned) {
 
     let activeQR = localStorage.getItem("activeQR");
     let time = localStorage.getItem("qrTime");
 
-    let now = Date.now();
-
-    // Expiry check
-    if (now - time > 10000) {
-        alert("QR Expired ❌");
+    if (!activeQR) {
+        alert("No session");
         return;
     }
 
-    // Match QR
+    if (Date.now() - time > 10000) {
+        alert("QR expired");
+        return;
+    }
+
     if (scanned !== activeQR) {
-        alert("Invalid QR ❌");
+        alert("Invalid QR");
         return;
     }
 
-    // Duplicate check
     let records = JSON.parse(localStorage.getItem("attendance") || "[]");
     let today = new Date().toLocaleDateString();
 
     if (records.find(r => r.date === today)) {
-        alert("Already Marked ❌");
+        alert("Already marked");
         return;
     }
 
-    // Save
-    records.push({ date: today, status: "Present" });
+    records.push({
+        date:   today,
+        status: "Present",
+        name:   localStorage.getItem("user") || "Student",
+        time:   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    });
     localStorage.setItem("attendance", JSON.stringify(records));
 
-    alert("Attendance Marked ✅");
+    alert("Attendance marked ✅");
 }
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function scanRealQR(text) {
+    validateQR(text);
+}
 
-let particles = [];
+function loadHistory() {
+    let records = JSON.parse(localStorage.getItem("attendance") || "[]");
+    let table = document.getElementById("historyTable");
 
-for (let i = 0; i < 50; i++) {
-    particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 3
+    table.innerHTML = "";
+
+    if (records.length === 0) {
+        table.innerHTML = `<tr><td colspan="2" class="no-records">No attendance records yet.</td></tr>`;
+        return;
+    }
+
+    records.forEach(r => {
+        table.innerHTML += `<tr>
+            <td>${r.date}</td>
+            <td><span class="badge badge-green">${r.status}</span></td>
+        </tr>`;
     });
 }
 
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "white";
-        ctx.fill();
-
-        p.y += 0.5;
-        if (p.y > canvas.height) p.y = 0;
-    });
-
-    requestAnimationFrame(animate);
+function loadPercentage() {
+    let records = JSON.parse(localStorage.getItem("attendance") || "[]");
+    let percent = Math.min((records.length / 30) * 100, 100);
+    document.getElementById("percent").innerText = percent.toFixed(1) + "%";
+    const bar = document.getElementById("percentBar");
+    if (bar) bar.style.width = percent + "%";
 }
-
-animate();
